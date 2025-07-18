@@ -53,6 +53,13 @@ add_action('plugins_loaded', function() {
     new WCSCI_Ajax();
 });
 
+// Declare HPOS compatibility
+add_action('before_woocommerce_init', function() {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+    }
+});
+
 // Activation hook
 register_activation_hook(__FILE__, function() {
     update_option('wcsci_version', WCSCI_VERSION);
