@@ -91,7 +91,9 @@ class WCSCI_Ajax {
             'data' => $data,
             'product_type' => $product_type,
             'product_name' => $product_name,
-            'parent_sku' => $parent_sku
+            'parent_sku' => $parent_sku,
+            'attribute_values' => $attribute_values,
+            'total_rows' => $row_count
         ), HOUR_IN_SECONDS);
         
         wp_send_json_success(array(
