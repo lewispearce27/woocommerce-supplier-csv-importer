@@ -129,41 +129,6 @@ class WCSCI_Importer {
         return $results;
     }
     
-    private function create_parent_product() {
-        // Check if exists
-        $existing_id = wc_get_product_id_by_sku($this->parent_sku);
-        if ($existing_id) {
-            $product = wc_get_product($existing_id);
-            if ($product->get_type() !== 'variable') {
-                // Delete and recreate as variable
-                wp_delete_post($existing_id, true);
-                $product = new WC_Product_Variable();
-            }
-        } else {
-            $product = new WC_Product_Variable();
-        }
-        
-        $product->set_name($this->product_name);
-        $product->set_sku($this->parent_sku);
-        $product->set_status('publish');
-        
-        // Set attributes
-        $product_attributes = array();
-        foreach ($this->attributes as $attr_name) {
-            $attribute = new WC_Product_Attribute();
-            $attribute->set_name(sanitize_title($attr_name));
-            $attribute->set_options($this->get_attribute_values($attr_name));
-            $attribute->set_visible(true);
-            $attribute->set_variation(true);
-            
-            $product_attributes[sanitize_title($attr_name)] = $attribute;
-        }
-        
-        $product->set_attributes($product_attributes);
-        
-        return $product->save();
-    }
-    
     private function create_variation($parent_id, $row) {
         // Get SKU
         $sku = $this->get_mapped_value($row, 'sku');
