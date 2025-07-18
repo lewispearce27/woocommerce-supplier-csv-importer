@@ -3,6 +3,8 @@ const wcsci = {
     productType: 'simple',
     csvHeaders: [],
     csvData: [],
+    totalRows: 0,
+    attributeValues: {},
     mapping: {},
     attributes: [],
     filteredValues: {},
@@ -93,6 +95,8 @@ const wcsci = {
             if (response.success) {
                 this.csvHeaders = response.data.headers;
                 this.csvData = response.data.sample_data;
+                this.totalRows = response.data.total_rows;
+                this.attributeValues = response.data.attribute_values || {};
                 this.showMapping();
                 this.nextStep();
             } else {
@@ -222,23 +226,25 @@ const wcsci = {
     },
     
     showVariationFilters() {
-        // Get unique values for each attribute
+        // Use pre-collected attribute values from server
         const attributeValues = {};
         
         this.attributes.forEach(attr => {
-            const values = new Set();
-            
-            // Use session data if available
-            const sessionData = window.wcsci_session_data;
-            const dataToUse = sessionData && sessionData.data ? sessionData.data : this.csvData;
-            
-            dataToUse.forEach(row => {
-                if (row[attr]) {
-                    values.add(row[attr].toString().trim());
-                }
-            });
-            
-            attributeValues[attr] = Array.from(values).sort();
+            if (this.attributeValues && this.attributeValues[attr]) {
+                // Sort the values - handle numeric values properly
+                attributeValues[attr] = this.attributeValues[attr].sort((a, b) => {
+                    // Try to parse as numbers first
+                    const numA = parseFloat(a);
+                    const numB = parseFloat(b);
+                    if (!isNaN(numA) && !isNaN(numB)) {
+                        return numA - numB;
+                    }
+                    // Otherwise sort as strings
+                    return a.localeCompare(b);
+                });
+            } else {
+                attributeValues[attr] = [];
+            }
         });
         
         let html = '';
