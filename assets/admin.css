@@ -1,1 +1,170 @@
+/* WooCommerce Supplier CSV Importer Styles */
 
+.wcsci-step {
+    margin: 20px 0;
+}
+
+.wcsci-card {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.wcsci-card label {
+    display: block;
+    margin: 15px 0 5px;
+    font-weight: 600;
+}
+
+.wcsci-card input[type="text"],
+.wcsci-card input[type="number"],
+.wcsci-card input[type="file"],
+.wcsci-card select {
+    width: 100%;
+    max-width: 400px;
+}
+
+.wcsci-card .description {
+    color: #666;
+    font-style: italic;
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+/* Radio Cards */
+.wcsci-radio-card {
+    display: block;
+    margin: 10px 0;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wcsci-radio-card:hover {
+    border-color: #2271b1;
+    background: #f6f7f7;
+}
+
+.wcsci-radio-card input[type="radio"] {
+    float: left;
+    margin: 3px 10px 0 0;
+}
+
+.radio-card-content {
+    overflow: hidden;
+}
+
+.radio-card-content strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.radio-card-content p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.wcsci-radio-card input[type="radio"]:checked + .radio-card-content strong {
+    color: #2271b1;
+}
+
+/* Progress Bar */
+.wcsci-progress-bar {
+    width: 100%;
+    height: 30px;
+    background: #f0f0f1;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 20px 0;
+    position: relative;
+}
+
+.wcsci-progress-fill {
+    height: 100%;
+    background: #2271b1;
+    width: 0%;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.wcsci-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        45deg,
+        rgba(255,255,255,.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255,255,255,.2) 50%,
+        rgba(255,255,255,.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 50px 50px;
+    animation: move 2s linear infinite;
+}
+
+@keyframes move {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
+}
+
+/* Mapping Table */
+#mapping-container table {
+    margin-top: 15px;
+}
+
+#mapping-container select {
+    width: 200px;
+}
+
+#mapping-container td {
+    padding: 8px;
+}
+
+/* Attribute Filters */
+.attribute-filter-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.attribute-filter-group h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.wcsci-card button {
+    margin-right: 10px;
+    margin-top: 15px;
+}
+
+/* Notices */
+#import-results .notice {
+    margin: 10px 0;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .wcsci-card input[type="text"],
+    .wcsci-card input[type="number"],
+    .wcsci-card input[type="file"],
+    .wcsci-card select {
+        max-width: 100%;
+    }
+    
+    #mapping-container {
+        overflow-x: auto;
+    }
+}
