@@ -347,24 +347,81 @@ const wcsci = {
         };
         
         try {
+            // Initialize import
             const response = await jQuery.ajax({
                 url: wcsci_ajax.ajax_url,
                 type: 'POST',
-                data: data,
-                beforeSend: () => {
-                    jQuery('.wcsci-progress-fill').css('width', '50%');
-                }
+                data: data
             });
             
-            jQuery('.wcsci-progress-fill').css('width', '100%');
-            
             if (response.success) {
-                this.showResults(response.data);
+                // Check if we need batch processing
+                if (response.data.total_batches > 1) {
+                    await this.processBatches(response.data.total_batches, response.data.batch_size, response.data.total_rows);
+                } else {
+                    // Small file, process normally
+                    await this.processBatches(1, response.data.total_rows, response.data.total_rows);
+                }
             } else {
                 jQuery('#import-results').html('<div class="notice notice-error"><p>Import failed: ' + response.data + '</p></div>');
             }
         } catch (error) {
             jQuery('#import-results').html('<div class="notice notice-error"><p>Import failed: ' + error + '</p></div>');
+        }
+    },
+    
+    async processBatches(totalBatches, batchSize, totalRows) {
+        let currentBatch = 1;
+        let cumulativeResults = {
+            success: 0,
+            failed: 0,
+            skipped: 0,
+            errors: []
+        };
+        
+        while (currentBatch <= totalBatches) {
+            const progress = Math.min(95, (currentBatch / totalBatches) * 100);
+            jQuery('.wcsci-progress-fill').css('width', progress + '%');
+            
+            jQuery('#import-status').html(
+                '<p><strong>Processing batch ' + currentBatch + ' of ' + totalBatches + '</strong></p>' +
+                '<p>Progress: ' + cumulativeResults.success + ' imported, ' + 
+                cumulativeResults.failed + ' failed, ' + 
+                cumulativeResults.skipped + ' skipped</p>'
+            );
+            
+            try {
+                const response = await jQuery.ajax({
+                    url: wcsci_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'wcsci_import_batch',
+                        nonce: wcsci_ajax.nonce,
+                        batch_number: currentBatch
+                    }
+                });
+                
+                if (response.success) {
+                    cumulativeResults = response.data.cumulative_results;
+                    currentBatch++;
+                    
+                    if (response.data.is_last_batch) {
+                        jQuery('.wcsci-progress-fill').css('width', '100%');
+                        this.showResults(cumulativeResults);
+                        break;
+                    }
+                } else {
+                    throw new Error(response.data);
+                }
+            } catch (error) {
+                jQuery('#import-results').html(
+                    '<div class="notice notice-error">' +
+                    '<p>Batch ' + currentBatch + ' failed: ' + error + '</p>' +
+                    '<p>Processed so far: ' + cumulativeResults.success + ' products</p>' +
+                    '</div>'
+                );
+                break;
+            }
         }
     },
     
