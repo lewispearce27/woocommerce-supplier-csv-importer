@@ -1,120 +1,140 @@
-
 # WooCommerce Supplier CSV Importer
 
-A WordPress plugin that imports supplier CSV files into WooCommerce with customizable field mapping and price markup functionality.
+A powerful WordPress plugin that imports supplier CSV files into WooCommerce with intelligent field mapping, price markup calculations, and advanced filtering capabilities.
 
-## Features
+## 🚀 Key Features
 
-- 🎯 **Simple or Variable Products** - Choose to import each row as a separate product or as variations of a single product
-- 📊 **Smart Column Mapping** - Automatically map CSV columns to WooCommerce fields
-- 💰 **Price Markup** - Add percentage markup to cost prices automatically
-- 🔍 **Variation Filtering** - Select exactly which variations to import
-- 🏷️ **Auto-SKU Generation** - Automatically generate parent SKUs from product names
-- ✅ **Validation** - Built-in validation for required fields
+- **📦 Flexible Product Import** - Import as simple products or variable products with multiple variations
+- **🔄 Batch Processing** - Handles large files (10,000+ rows) without timeouts or memory issues
+- **🎯 Smart Column Mapping** - Intuitive interface to map CSV columns to WooCommerce fields
+- **💰 Automatic Price Markup** - Apply percentage markups to supplier cost prices
+- **🔍 Advanced Variation Filtering** - Select exactly which product variations to import
+- **🏷️ Auto-SKU Generation** - Automatically generate parent SKUs from product names
+- **✅ Built-in Validation** - Ensures data integrity with required field checking
+- **📊 Real-time Progress** - Live import progress with batch-by-batch updates
+- **🔧 HPOS Compatible** - Fully compatible with WooCommerce High-Performance Order Storage
 
-## Requirements
+## 📋 Requirements
 
 - WordPress 5.8 or higher
 - WooCommerce 5.0 or higher
 - PHP 7.4 or higher
+- Maximum PHP execution time of at least 300 seconds (for large imports)
 
-## Installation
+## 🛠️ Installation
 
-### Method 1: Upload via WordPress Admin
+### Method 1: WordPress Admin Upload
 
-1. Download this repository as a ZIP file
-2. Go to WordPress Admin > Plugins > Add New
-3. Click "Upload Plugin" and select the ZIP file
-4. Click "Install Now" and then "Activate"
+1. Download the latest release from [Releases](https://github.com/yourname/woocommerce-supplier-csv-importer/releases)
+2. Navigate to **WordPress Admin > Plugins > Add New**
+3. Click **Upload Plugin** and select the downloaded ZIP file
+4. Click **Install Now** and then **Activate**
 
 ### Method 2: Manual Installation
 
-1. Download this repository
-2. Upload the `woocommerce-supplier-csv-importer` folder to `/wp-content/plugins/`
-3. Activate the plugin through the 'Plugins' menu in WordPress
+1. Download this repository as a ZIP file
+2. Extract the ZIP file
+3. Upload the `woocommerce-supplier-csv-importer` folder to `/wp-content/plugins/`
+4. Activate the plugin through the **Plugins** menu in WordPress
 
-## Usage
+## 📖 Usage Guide
 
 ### Step 1: Select Product Type
-Navigate to **WooCommerce > Supplier CSV Import** and choose:
-- **Simple Products**: Each CSV row creates a separate product
-- **Variable Product**: All CSV rows become variations of one product
+Navigate to **WooCommerce > Supplier CSV Import**
 
-### Step 2: Upload CSV & Product Details
-- For variable products, enter the product name (auto-generates parent SKU)
-- Select your CSV file and upload
+Choose your import type:
+- **Simple Products**: Each CSV row creates a separate product
+- **Variable Product**: All CSV rows become variations of a single parent product
+
+### Step 2: Product Details & CSV Upload
+**For Variable Products:**
+- Enter the product name (e.g., "Business Cards")
+- Parent SKU is auto-generated (can be edited)
+- Upload your supplier's CSV file
+
+**For Simple Products:**
+- Simply upload your CSV file
 
 ### Step 3: Map CSV Columns
 Map your CSV columns to WooCommerce fields:
-- SKU (required)
-- Product Name (required for simple products)
-- Cost Price (required)
+
+**Required Fields:**
+- SKU (always required)
+- Product Name (simple products only)
+- Cost Price (for markup calculation)
+
+**Optional Fields:**
 - Description
 - Stock Quantity
+- Weight, Length, Width, Height
+- And more...
 
-### Step 4: Select Attributes (Variable Products)
-Choose which CSV columns should be used as product variations (e.g., Size, Color, Material)
+### Step 4: Select Attributes (Variable Products Only)
+Choose which CSV columns represent product variations:
+- Size, Color, Material, Quantity, etc.
+- Any column can become a variation attribute
+- Skip columns that are already mapped (SKU, Price, etc.)
 
-### Step 5: Filter Variations (Variable Products)
-Select exactly which variation combinations to import:
-- Use "Select All" / "Select None" buttons for quick selection
+### Step 5: Filter Variations (Variable Products Only)
+Fine-tune which variations to import:
+- View all unique values for each attribute
+- Use "Select All" / "Select None" for quick selection
 - Preview shows total variations to be created
+- Perfect for importing only specific sizes, colors, or quantities
 
 ### Step 6: Set Markup & Import
-- Enter your price markup percentage
-- Review import summary
-- Click "Start Import"
+- Enter your price markup percentage (e.g., 25 for 25% markup)
+- Review the import summary
+- Click **Start Import** to begin
 
-## CSV Format Example
+**Large File Processing:**
+- Files over 500 rows are automatically processed in batches
+- Real-time progress updates show current batch and totals
+- Import continues even if individual items fail
 
-### For Simple Products:
+## 📊 CSV Format Examples
+
+### Simple Products CSV
 ```csv
 SKU,Product Name,Cost Price,Description,Stock
-PROD-001,Widget A,10.00,High quality widget,100
-PROD-002,Widget B,15.00,Premium widget,50
+PROD-001,Premium Widget,10.00,High quality widget,100
+PROD-002,Deluxe Widget,15.00,Premium deluxe widget,50
+PROD-003,Basic Widget,5.00,Entry level widget,200
 ```
 
-### For Variable Products:
+### Variable Products CSV (e.g., Flyers)
 ```csv
-SKU,Size,Color,Cost Price,Description
-WIDGET-S-RED,Small,Red,10.00,Red widget small
-WIDGET-M-RED,Medium,Red,12.00,Red widget medium
-WIDGET-L-RED,Large,Red,14.00,Red widget large
-WIDGET-S-BLUE,Small,Blue,10.00,Blue widget small
+SKU,Quantity,Finished Size,Paper Type,Print Type,Turnaround,Price £
+FLY-A5-100,100,A5,170gsm Silk,Double Sided,3-4 Working Days,25.00
+FLY-A5-250,250,A5,170gsm Silk,Double Sided,3-4 Working Days,35.00
+FLY-A5-500,500,A5,170gsm Silk,Double Sided,3-4 Working Days,45.00
+FLY-A5-1000,1000,A5,170gsm Silk,Double Sided,3-4 Working Days,65.00
 ```
 
-## File Structure
+## 🏗️ Technical Details
 
+### File Structure
 ```
 woocommerce-supplier-csv-importer/
 ├── woocommerce-supplier-csv-importer.php    # Main plugin file
 ├── includes/
-│   ├── class-wcsci-admin.php               # Admin interface
-│   ├── class-wcsci-ajax.php                # AJAX handlers
-│   └── class-wcsci-importer.php            # Import logic
+│   ├── class-wcsci-admin.php               # Admin interface & UI
+│   ├── class-wcsci-ajax.php                # AJAX handlers & batch processing
+│   └── class-wcsci-importer.php            # Core import logic
 ├── assets/
-│   ├── admin.js                            # JavaScript
-│   └── admin.css                           # Styles
+│   ├── admin.js                            # Frontend JavaScript
+│   └── admin.css                           # Admin styling
 └── README.md                               # This file
 ```
 
-## Changelog
+### Performance
+- **Batch Size**: 500 rows per batch
+- **Memory Efficient**: Only loads current batch into memory
+- **Timeout Prevention**: Each batch processes independently
+- **Large File Support**: Tested with 10,000+ row CSV files
 
-### Version 2.0.0
-- Complete rebuild with streamlined architecture
-- Added variation filtering for selective import
-- Improved error handling and validation
-- Auto-SKU generation from product names
-- Better support for large CSV files
-
-## Support
-
-For issues or feature requests, please use the [GitHub Issues](https://github.com/yourname/woocommerce-supplier-csv-importer/issues) page.
-
-## License
-
-GPL v2 or later
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+### Data Processing
+- **Unique Value Collection**: Scans entire CSV for all attribute values
+- **Smart Filtering**: Only imports selected variation combinations
+- **Duplicate Prevention**: Updates existing products by SKU match
+- **Error Collection**: Captu
