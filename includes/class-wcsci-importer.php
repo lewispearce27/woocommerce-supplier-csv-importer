@@ -17,6 +17,7 @@ class WCSCI_Importer {
     private $parent_sku;
     private $attributes;
     private $filtered_values;
+    private $parent_id = null;
     
     public function __construct($data, $mapping, $markup, $product_type, $product_name, $parent_sku, $attributes = array(), $filtered_values = array()) {
         $this->data = $data;
@@ -29,6 +30,45 @@ class WCSCI_Importer {
         $this->filtered_values = $filtered_values;
     }
     
+    public function set_parent_id($parent_id) {
+        $this->parent_id = $parent_id;
+    }
+    
+    public function create_parent_product() {
+        // Check if exists
+        $existing_id = wc_get_product_id_by_sku($this->parent_sku);
+        if ($existing_id) {
+            $product = wc_get_product($existing_id);
+            if ($product->get_type() !== 'variable') {
+                // Delete and recreate as variable
+                wp_delete_post($existing_id, true);
+                $product = new WC_Product_Variable();
+            }
+        } else {
+            $product = new WC_Product_Variable();
+        }
+        
+        $product->set_name($this->product_name);
+        $product->set_sku($this->parent_sku);
+        $product->set_status('publish');
+        
+        // Set attributes
+        $product_attributes = array();
+        foreach ($this->attributes as $attr_name) {
+            $attribute = new WC_Product_Attribute();
+            $attribute->set_name(sanitize_title($attr_name));
+            $attribute->set_options($this->get_attribute_values($attr_name));
+            $attribute->set_visible(true);
+            $attribute->set_variation(true);
+            
+            $product_attributes[sanitize_title($attr_name)] = $attribute;
+        }
+        
+        $product->set_attributes($product_attributes);
+        
+        return $product->save();
+    }
+    
     public function import() {
         $results = array(
             'success' => 0,
@@ -38,12 +78,14 @@ class WCSCI_Importer {
         );
         
         if ($this->product_type === 'variable') {
-            // Create parent product
-            $parent_id = $this->create_parent_product();
-            
-            if (!$parent_id) {
-                $results['errors'][] = 'Failed to create parent product';
-                return $results;
+            // For batch processing, parent product is created separately
+            if (!$this->parent_id) {
+                $this->parent_id = $this->create_parent_product();
+                
+                if (!$this->parent_id) {
+                    $results['errors'][] = 'Failed to create parent product';
+                    return $results;
+                }
             }
             
             // Import variations
@@ -55,7 +97,7 @@ class WCSCI_Importer {
                 }
                 
                 try {
-                    $variation_id = $this->create_variation($parent_id, $row);
+                    $variation_id = $this->create_variation($this->parent_id, $row);
                     if ($variation_id) {
                         $results['success']++;
                     } else {
@@ -66,9 +108,6 @@ class WCSCI_Importer {
                     $results['errors'][] = $e->getMessage();
                 }
             }
-            
-            // Sync parent product
-            WC_Product_Variable::sync($parent_id);
             
         } else {
             // Import simple products
