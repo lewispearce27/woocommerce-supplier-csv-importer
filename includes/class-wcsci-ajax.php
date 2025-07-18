@@ -51,11 +51,28 @@ class WCSCI_Ajax {
         $data = array();
         $sample_data = array();
         $row_count = 0;
+        $attribute_values = array();
+        
+        // Initialize attribute value arrays
+        foreach ($headers as $header) {
+            $attribute_values[$header] = array();
+        }
         
         while (($row = fgetcsv($handle)) !== false) {
             if (count($row) === count($headers)) {
                 $row_data = array_combine($headers, $row);
-                $data[] = $row_data;
+                
+                // Collect unique attribute values
+                foreach ($row_data as $key => $value) {
+                    if (!empty($value) && !in_array($value, $attribute_values[$key])) {
+                        $attribute_values[$key][] = $value;
+                    }
+                }
+                
+                // Store full data (limited for memory)
+                if ($row_count < 1000) {
+                    $data[] = $row_data;
+                }
                 
                 if ($row_count < 5) {
                     $sample_data[] = $row_data;
@@ -80,7 +97,8 @@ class WCSCI_Ajax {
         wp_send_json_success(array(
             'headers' => $headers,
             'sample_data' => $sample_data,
-            'total_rows' => count($data)
+            'total_rows' => $row_count,
+            'attribute_values' => $attribute_values
         ));
     }
     
